@@ -1,1 +1,5 @@
-
+resource_group_name  = "rg-terraform"
+storage_account_name = "abbtsjd923nj42343"
+container_name       = "tfstate"
+key                  = "dev.terraform.tfstate"
+subscription_id      = "f5ae0e3f-56db-4418-9492-c7c95cef62eb"

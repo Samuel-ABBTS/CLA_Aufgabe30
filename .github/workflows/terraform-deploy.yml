@@ -1,1 +1,36 @@
+name: Terraform Deploy
+on:
+  push:
+    branches:
+      - dev
+      - main
+jobs:
+  terraform-deploy:
+    runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+      - name: Select environment
+        id: envselect
+        run: |
+          if [ "${{ github.ref_name }}" = "dev" ]; then
+            echo "environment=dev" >> $GITHUB_OUTPUT
+          else
+            echo "environment=prd" >> $GITHUB_OUTPUT
+          fi
 
+      - name: Terraform Init
+        run: terraform init -backend-config="./config/${{ steps.envselect.outputs.environment }}.azurerm.tfbackend"
+
+      - name: Terraform Plan
+        run: terraform plan -var-file="./config/${{ steps.envselect.outputs.environment }}.tfvars"
+
+      - name: Terraform Apply
+        run: terraform apply -var-file="./config/${{ steps.envselect.outputs.environment }}.tfvars" -auto-approve

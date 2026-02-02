@@ -1,1 +1,2 @@
-
+key                  = "prd.terraform.tfstate"
+# Rest identisch, falls gleicher Storage Account genutzt wird
